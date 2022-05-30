@@ -13,7 +13,7 @@ torch.manual_seed(123)
 print('seed created')
 
 ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
-BATCH_SIZE = 1
+BATCH_SIZE = 4
 LEARNING_RATE = 1e-4
 NUM_WORKERS = 0
 NUM_EPOCHS = 200
