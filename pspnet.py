@@ -41,7 +41,7 @@ class PSPUpsample(nn.Module):
 
 
 class PSPNet(nn.Module):
-    def __init__(self, backbone_type='resnet34', pretrained=True, pool_scale=[1, 2, 3, 6], backbone_out_features=512, n_classes=20) -> None:
+    def __init__(self, backbone_type='resnet34', pretrained=True, pool_scale=[1, 2, 3, 6], backbone_out_features=512, n_classes=21) -> None:
         super(PSPNet,self).__init__()
         self.backbone = model_factory(backbone_type, pretrained)
         self.psp = PSPModule(backbone_out_features, 1024, pool_scale)

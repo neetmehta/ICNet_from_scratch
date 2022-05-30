@@ -1,4 +1,5 @@
 from torch.utils.data import Dataset
+from torchvision.transforms import transforms
 import os
 from os.path import join as osp
 from PIL import Image
@@ -53,15 +54,16 @@ labels = [
     
 ]
 
+img_transforms = transforms.Compose([transforms.ToTensor()])
 
 class Cityscapes(Dataset):
 
-    def __init__(self, root, set_type='train', transforms=None) -> None:
+    def __init__(self, root, set_type='train', transforms=img_transforms) -> None:
         super(Cityscapes, self).__init__()
         self.image_list = []
         self.label_list = []
         image_root = osp(root,'leftImg8bit', set_type)
-
+        self.transforms = transforms
         label_root = osp(root,'gtFine', set_type)
         for city in os.listdir(image_root):
             self.image_list += [osp(image_root,city,i) for i in os.listdir(osp(image_root, city))]
@@ -73,6 +75,8 @@ class Cityscapes(Dataset):
 
     def __getitem__(self, index):
         image = Image.open(self.image_list[index])
+        if self.transforms is not None:
+            image = self.transforms(image)
         label = cv2.imread(self.label_list[index])
         label = cv2.cvtColor(label, cv2.COLOR_BGR2RGB)
         target = np.zeros((21,label.shape[0],label.shape[1]))
