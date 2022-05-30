@@ -12,13 +12,13 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
-ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
-BATCH_SIZE = 4
+ROOT = "/Cityscapes"
+BATCH_SIZE = 16
 LEARNING_RATE = 1e-4
 NUM_WORKERS = 0
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
-
+os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
