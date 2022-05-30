@@ -6,6 +6,12 @@ import os
 from data import Cityscapes
 from pspnet import PSPNet
 
+import random
+
+random.seed(123)
+torch.manual_seed(123)
+print('seed created')
+
 ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
 BATCH_SIZE = 1
 LEARNING_RATE = 1e-4
