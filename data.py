@@ -53,8 +53,8 @@ labels = [
     Label(  'unlabeled'            , -1 ,      255 , 'void'            , 0       , False        , True         , (  0,  0,  0) ),
     
 ]
-
-img_transforms = transforms.Compose([transforms.ToTensor()])
+resize = (256,512)
+img_transforms = transforms.Compose([transforms.Resize(resize), transforms.ToTensor()])
 
 class Cityscapes(Dataset):
 
@@ -79,6 +79,7 @@ class Cityscapes(Dataset):
             image = self.transforms(image)
         label = cv2.imread(self.label_list[index])
         label = cv2.cvtColor(label, cv2.COLOR_BGR2RGB)
+        label = cv2.resize(label, (resize[1],resize[0]))
         target = np.zeros((21,label.shape[0],label.shape[1]))
         for obj in labels:
             if obj.id == -1:
