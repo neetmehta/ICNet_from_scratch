@@ -14,10 +14,10 @@ print('seed created')
 
 PRETRAINED = True
 BACKBONE = 'resnet152'
-ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
-BATCH_SIZE = 1
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 0
+ROOT = r"/Cityscapes"
+BATCH_SIZE = 16
+LEARNING_RATE = 5e-4
+NUM_WORKERS = 2
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
 RESUME = False
