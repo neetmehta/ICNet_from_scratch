@@ -83,10 +83,12 @@ class SqueezeNet(nn.Module):
         else:
             print("unknown model")
 
+        if 'classifier' in self.model._modules.keys():
+            del self.model._modules['classifier']
 
     def forward(self, x):
 
-        return self.model(x)
+        return self.model._modules['features'](x)
 
 def model_factory(model_type, pretrained):
     if model_type == 'densenet121':

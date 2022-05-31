@@ -12,11 +12,11 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
-BACKBONE = 'resnet101'
-ROOT = "/Cityscapes"
-BATCH_SIZE = 32
+BACKBONE = 'squeezenet1_0'
+ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
+BATCH_SIZE = 1
 LEARNING_RATE = 1e-4
-NUM_WORKERS = 2
+NUM_WORKERS = 0
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
 RESUME = False
@@ -24,7 +24,20 @@ CKPT_PATH = "ckpt/pspnet_epoch_100.ckpt"
 os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+models = {
+            'resnet18':PSPNet(backbone_type="resnet18", backbone_out_features=512),
+            'resnet34':PSPNet(backbone_type="resnet34", backbone_out_features=512),
+            'resnet50':PSPNet(backbone_type="resnet50", backbone_out_features=2048),
+            'resnet101':PSPNet(backbone_type="resnet101", backbone_out_features=2048),
+            'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048),
+            'densenet121':PSPNet(backbone_type="densenet121", backbone_out_features=1920),
+            'densenet161':PSPNet(backbone_type="densenet161", backbone_out_features=1920),
+            'densenet169':PSPNet(backbone_type="densenet169", backbone_out_features=1920),
+            'densenet201':PSPNet(backbone_type="densenet201", backbone_out_features=1920),
+            'squeezenet1_0':PSPNet(backbone_type="squeezenet1_0", backbone_out_features=512),
+            'squeezenet1_1':PSPNet(backbone_type="squeezenet1_1", backbone_out_features=512),
 
+}
 
 train_data = Cityscapes(root=ROOT, set_type='train')
 val_data = Cityscapes(root=ROOT, set_type='val')
@@ -32,7 +45,7 @@ val_data = Cityscapes(root=ROOT, set_type='val')
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 start_epoch = 0
-model = PSPNet(backbone_type=BACKBONE).to(device)
+model = models[BACKBONE].to(device)
 if RESUME:
     state_dict = torch.load(CKPT_PATH)
     model.load_state_dict(state_dict["model_state_dict"])
