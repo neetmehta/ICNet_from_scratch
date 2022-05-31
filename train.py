@@ -40,7 +40,7 @@ if RESUME:
     print(f"Starting training from epoch: {start_epoch-1} the loss was {loss}")
 
 
-criterion = torch.nn.BCEWithLogitsLoss(reduction='sum')
+criterion = torch.nn.NLLLoss2d()
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 print(f"Number of parameters = {sum(i.numel() for i in model.parameters())}")
 print('Starting training')
@@ -50,6 +50,7 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     model.train()
     for image, target, label in loop:
         image, target = image.to(device), target.to(device)
+        target = torch.argmax(target, dim=1)
         pred = model(image)
         loss = criterion(pred, target)
         mean_loss.append(loss.item())
