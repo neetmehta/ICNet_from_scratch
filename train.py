@@ -12,14 +12,15 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
+BACKBONE = 'resnet101'
 ROOT = "/Cityscapes"
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
 NUM_WORKERS = 2
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
-RESUME = True
-CKPT_PATH = "ckpt/pspnet_epoch_20.ckpt"
+RESUME = False
+CKPT_PATH = "ckpt/pspnet_epoch_100.ckpt"
 os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -31,7 +32,7 @@ val_data = Cityscapes(root=ROOT, set_type='val')
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 start_epoch = 0
-model = PSPNet(backbone_type='resnet18').to(device)
+model = PSPNet(backbone_type=BACKBONE).to(device)
 if RESUME:
     state_dict = torch.load(CKPT_PATH)
     model.load_state_dict(state_dict["model_state_dict"])
@@ -86,5 +87,5 @@ for epoch in range(start_epoch, NUM_EPOCHS):
                 'model_state_dict': model.state_dict(), 
                 'optimizer_state_dict': optimizer.state_dict()}
 
-        torch.save(state_dict, os.path.join(CKPT_DIR, f"pspnet_epoch_{epoch}.ckpt"))
+        torch.save(state_dict, os.path.join(CKPT_DIR, f"pspnet_{BACKBONE}_epoch_{epoch}.ckpt"))
 
