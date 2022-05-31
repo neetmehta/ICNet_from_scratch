@@ -47,6 +47,7 @@ print('Starting training')
 for epoch in range(start_epoch, NUM_EPOCHS):
     loop = tqdm(train_loader)
     mean_loss = []
+    model.train()
     for image, target, label in loop:
         image, target = image.to(device), target.to(device)
         pred = model(image)
@@ -64,14 +65,16 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     print("starting validation ...")
     loop = tqdm(val_loader)
     mean_loss = []
+    model.eval()
     for image, target, label in loop:
-        image, target = image.to(device), target.to(device)
-        pred = model(image)
-        loss = criterion(pred, target)
-        mean_loss.append(loss.item())
+        with torch.no_grad():
+            image, target = image.to(device), target.to(device)
+            pred = model(image)
+            loss = criterion(pred, target)
+            mean_loss.append(loss.item())
 
-        loop.set_description(f"Epoch [{epoch}/{NUM_EPOCHS}]")
-        loop.set_postfix(loss=loss.item())
+            loop.set_description(f"Epoch [{epoch}/{NUM_EPOCHS}]")
+            loop.set_postfix(loss=loss.item())
 
     print(f"Mean val loss was {sum(mean_loss)/len(mean_loss)}")
 
