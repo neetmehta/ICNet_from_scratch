@@ -40,7 +40,7 @@ if RESUME:
     print(f"Starting training from epoch: {start_epoch-1} the loss was {loss}")
 
 
-criterion = torch.nn.BCEWithLogitsLoss()
+criterion = torch.nn.BCEWithLogitsLoss(reduction='sum')
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 print(f"Number of parameters = {sum(i.numel() for i in model.parameters())}")
 print('Starting training')
