@@ -12,7 +12,8 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
-BACKBONE = 'squeezenet1_0'
+PRETRAINED = True
+BACKBONE = 'resnet152'
 ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
 BATCH_SIZE = 1
 LEARNING_RATE = 1e-4
@@ -25,17 +26,17 @@ os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 models = {
-            'resnet18':PSPNet(backbone_type="resnet18", backbone_out_features=512),
-            'resnet34':PSPNet(backbone_type="resnet34", backbone_out_features=512),
-            'resnet50':PSPNet(backbone_type="resnet50", backbone_out_features=2048),
-            'resnet101':PSPNet(backbone_type="resnet101", backbone_out_features=2048),
-            'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048),
-            'densenet121':PSPNet(backbone_type="densenet121", backbone_out_features=1920),
-            'densenet161':PSPNet(backbone_type="densenet161", backbone_out_features=1920),
-            'densenet169':PSPNet(backbone_type="densenet169", backbone_out_features=1920),
-            'densenet201':PSPNet(backbone_type="densenet201", backbone_out_features=1920),
-            'squeezenet1_0':PSPNet(backbone_type="squeezenet1_0", backbone_out_features=512),
-            'squeezenet1_1':PSPNet(backbone_type="squeezenet1_1", backbone_out_features=512),
+            'resnet18':PSPNet(backbone_type="resnet18", backbone_out_features=512, pretrained=PRETRAINED),
+            'resnet34':PSPNet(backbone_type="resnet34", backbone_out_features=512, pretrained=PRETRAINED),
+            'resnet50':PSPNet(backbone_type="resnet50", backbone_out_features=2048, pretrained=PRETRAINED),
+            'resnet101':PSPNet(backbone_type="resnet101", backbone_out_features=2048, pretrained=PRETRAINED),
+            'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048, pretrained=PRETRAINED),
+            'densenet121':PSPNet(backbone_type="densenet121", backbone_out_features=1920, pretrained=PRETRAINED),
+            'densenet161':PSPNet(backbone_type="densenet161", backbone_out_features=1920, pretrained=PRETRAINED),
+            'densenet169':PSPNet(backbone_type="densenet169", backbone_out_features=1920, pretrained=PRETRAINED),
+            'densenet201':PSPNet(backbone_type="densenet201", backbone_out_features=1920, pretrained=PRETRAINED),
+            'squeezenet1_0':PSPNet(backbone_type="squeezenet1_0", backbone_out_features=512, pretrained=PRETRAINED),
+            'squeezenet1_1':PSPNet(backbone_type="squeezenet1_1", backbone_out_features=512, pretrained=PRETRAINED),
 
 }
 
