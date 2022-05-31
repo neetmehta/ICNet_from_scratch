@@ -1,3 +1,4 @@
+import torch
 from torch.utils.data import Dataset
 from torchvision.transforms import transforms
 import os
@@ -87,7 +88,7 @@ class Cityscapes(Dataset):
             else:    
                 target[obj.id][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 1
                 target[0][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 0
-
+        target = torch.from_numpy(target)
         return image, target, label
 
                 
