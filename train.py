@@ -49,8 +49,8 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     mean_loss = []
     model.train()
     for image, target, label in loop:
-        image, target = image.to(device), target.to(device)
         target = torch.argmax(target, dim=1)
+        image, target = image.to(device), target.to(device)
         pred = model(image)
         loss = criterion(pred, target)
         mean_loss.append(loss.item())
@@ -69,6 +69,7 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     model.eval()
     for image, target, label in loop:
         with torch.no_grad():
+            target = torch.argmax(target, dim=1)
             image, target = image.to(device), target.to(device)
             pred = model(image)
             loss = criterion(pred, target)
