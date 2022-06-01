@@ -56,7 +56,7 @@ class PSPNet(nn.Module):
             nn.Conv2d(64, n_classes, kernel_size=1),
             nn.LogSoftmax()
         )
-        self.network = nn.Sequential(self.backbone, self.psp, self.drop_1, self.up_1, self.up_2, self.up_3, self.up_4, self.up_5, self.drop_2, self.final)
+        self.network = nn.Sequential(self.backbone, self.psp, self.drop_1, self.up_1, self.up_2, self.up_3, self.drop_2, self.final)
 
     def forward(self, x):
         return self.network(x)
