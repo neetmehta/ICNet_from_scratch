@@ -31,13 +31,6 @@ models = {
             'resnet50':PSPNet(backbone_type="resnet50", backbone_out_features=2048, pretrained=PRETRAINED),
             'resnet101':PSPNet(backbone_type="resnet101", backbone_out_features=2048, pretrained=PRETRAINED),
             'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048, pretrained=PRETRAINED),
-            'densenet121':PSPNet(backbone_type="densenet121", backbone_out_features=1920, pretrained=PRETRAINED),
-            'densenet161':PSPNet(backbone_type="densenet161", backbone_out_features=1920, pretrained=PRETRAINED),
-            'densenet169':PSPNet(backbone_type="densenet169", backbone_out_features=1920, pretrained=PRETRAINED),
-            'densenet201':PSPNet(backbone_type="densenet201", backbone_out_features=1920, pretrained=PRETRAINED),
-            'squeezenet1_0':PSPNet(backbone_type="squeezenet1_0", backbone_out_features=512, pretrained=PRETRAINED),
-            'squeezenet1_1':PSPNet(backbone_type="squeezenet1_1", backbone_out_features=512, pretrained=PRETRAINED),
-
 }
 
 train_data = Cityscapes(root=ROOT, set_type='train')
