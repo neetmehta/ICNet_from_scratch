@@ -47,11 +47,9 @@ class PSPNet(nn.Module):
         self.psp = PSPModule(backbone_out_features, 1024, pool_scale)
         self.drop_1 = nn.Dropout2d(p=0.3)
 
-        self.up_1 = PSPUpsample(1024, 512)
-        self.up_2 = PSPUpsample(512, 256)
-        self.up_3 = PSPUpsample(256, 128)
-        self.up_4 = PSPUpsample(128, 64)
-        self.up_5 = PSPUpsample(64, 64)
+        self.up_1 = PSPUpsample(1024, 256)
+        self.up_2 = PSPUpsample(256, 64)
+        self.up_3 = PSPUpsample(64, 64)
 
         self.drop_2 = nn.Dropout2d(p=0.15)
         self.final = nn.Sequential(
