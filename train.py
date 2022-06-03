@@ -49,7 +49,7 @@ if RESUME:
     model.load_state_dict(state_dict["model_state_dict"])
     start_epoch = state_dict["epoch"] + 1
     val_loss = state_dict['loss']
-    print(f"Starting training from epoch: {start_epoch-1} the loss was {loss}")
+    print(f"Starting training from epoch: {start_epoch-1} the loss was {val_loss}")
 
 
 criterion = torch.nn.NLLLoss2d()
