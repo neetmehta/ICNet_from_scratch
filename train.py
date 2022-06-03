@@ -12,6 +12,7 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
+
 APPLY_AUG = True
 PRETRAINED = True
 BACKBONE = 'resnet152'
@@ -19,6 +20,7 @@ ROOT = r"/Cityscapes"
 BATCH_SIZE = 16
 LEARNING_RATE = 5e-4
 NUM_WORKERS = 2
+PIN_MEMORY = True
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
 RESUME = False
@@ -37,7 +39,7 @@ models = {
 train_data = Cityscapes(root=ROOT, set_type='train', apply_aug=APPLY_AUG)
 val_data = Cityscapes(root=ROOT, set_type='val')
 
-train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
+train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=PIN_MEMORY)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 start_epoch = 0
 model = models[BACKBONE].to(device)
