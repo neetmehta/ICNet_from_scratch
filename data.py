@@ -7,6 +7,10 @@ from PIL import Image
 import cv2
 import numpy as np
 from collections import namedtuple
+import random
+import torchvision.transforms.functional as TF
+
+from transforms import RandomHorizontalflip, RandomVerticalflip
 
 Label = namedtuple('Label', [
                    'name', 
@@ -55,11 +59,15 @@ labels = [
     
 ]
 resize = (256,512)
-img_transforms = transforms.Compose([transforms.Resize(resize), transforms.ToTensor()])
+img_transforms = transforms.RandomChoice([transforms.ColorJitter(brightness=.5, hue=.3), transforms.GaussianBlur(15, (2,10)), transforms.RandomPosterize(bits=2)])
+# joint_transforms = transforms.Compose([RandomHorizontalflip(), RandomVerticalflip()])
+to_pil = transforms.ToPILImage()
+to_tensor = transforms.ToTensor()
+
 
 class Cityscapes(Dataset):
 
-    def __init__(self, root, set_type='train', transforms=img_transforms) -> None:
+    def __init__(self, root, set_type='train', transforms=img_transforms, apply_aug=False) -> None:
         super(Cityscapes, self).__init__()
         self.image_list = []
         self.label_list = []
@@ -70,17 +78,28 @@ class Cityscapes(Dataset):
             self.image_list += [osp(image_root,city,i) for i in os.listdir(osp(image_root, city))]
             self.label_list += [osp(label_root,city,i[:-15]+"gtFine_color.png") for i in os.listdir(osp(image_root, city))]
 
+        self.apply_aug = apply_aug
+
 
     def __len__(self):
         return len(self.image_list)
 
     def __getitem__(self, index):
         image = Image.open(self.image_list[index])
-        if self.transforms is not None:
-            image = self.transforms(image)
-        label = cv2.imread(self.label_list[index])
-        label = cv2.cvtColor(label, cv2.COLOR_BGR2RGB)
-        label = cv2.resize(label, (resize[1],resize[0]))
+        label = Image.open(self.label_list[index])
+
+        if self.apply_aug:
+            image, label = RandomHorizontalflip()(image,label)
+            image, label = RandomVerticalflip()(image,label)
+            image = img_transforms(image)
+            image = to_tensor(image)
+
+            label = np.asarray(label)
+
+        else:
+            image = to_tensor(image)
+            label = np.asarray(label)
+
         target = np.zeros((21,label.shape[0],label.shape[1]))
         for obj in labels:
             if obj.id == -1:
@@ -90,5 +109,29 @@ class Cityscapes(Dataset):
                 target[0][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 0
         target = torch.from_numpy(target)
         return image, target, label
+
+class RandomHorizontalflip:
+    """"""
+
+    def __init__(self, prob=0.5):
+        self.prob = prob
+
+    def __call__(self, image, mask):
+        if random.random() > self.prob:
+            image = TF.hflip(image)
+            mask = TF.hflip(mask)
+        return image, mask
+
+class RandomVerticalflip:
+    """"""
+
+    def __init__(self, prob=0.5):
+        self.prob = prob
+
+    def __call__(self, image, mask):
+        if random.random() > self.prob:
+            image = TF.vflip(image)
+            mask = TF.vflip(mask)
+        return image, mask
 
                 

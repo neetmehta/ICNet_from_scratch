@@ -12,6 +12,7 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
+APPLY_AUG = True
 PRETRAINED = True
 BACKBONE = 'resnet152'
 ROOT = r"/Cityscapes"
@@ -33,7 +34,7 @@ models = {
             'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048, pretrained=PRETRAINED),
 }
 
-train_data = Cityscapes(root=ROOT, set_type='train')
+train_data = Cityscapes(root=ROOT, set_type='train', apply_aug=APPLY_AUG)
 val_data = Cityscapes(root=ROOT, set_type='val')
 
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
