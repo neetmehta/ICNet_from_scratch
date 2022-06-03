@@ -59,6 +59,7 @@ labels = [
     
 ]
 resize = (256,512)
+img_resize = transforms.Resize(resize)
 img_transforms = transforms.RandomChoice([transforms.ColorJitter(brightness=.5, hue=.3), transforms.GaussianBlur(15, (2,10)), transforms.RandomPosterize(bits=2)])
 # joint_transforms = transforms.Compose([RandomHorizontalflip(), RandomVerticalflip()])
 to_pil = transforms.ToPILImage()
@@ -87,7 +88,7 @@ class Cityscapes(Dataset):
     def __getitem__(self, index):
         image = Image.open(self.image_list[index])
         label = Image.open(self.label_list[index])
-
+        image, label = img_resize(image), img_resize(label)
         if self.apply_aug:
             image, label = RandomHorizontalflip()(image,label)
             image, label = RandomVerticalflip()(image,label)
