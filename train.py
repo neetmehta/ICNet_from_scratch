@@ -60,7 +60,7 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     loop = tqdm(train_loader)
     mean_loss = []
     model.train()
-    for image, target, label in loop:
+    for image, target in loop:
         target = torch.argmax(target, dim=1)
         image, target = image.to(device), target.to(device)
         pred = model(image)
@@ -79,7 +79,7 @@ for epoch in range(start_epoch, NUM_EPOCHS):
     loop = tqdm(val_loader)
     mean_loss = []
     model.eval()
-    for image, target, label in loop:
+    for image, target in loop:
         with torch.no_grad():
             target = torch.argmax(target, dim=1)
             image, target = image.to(device), target.to(device)

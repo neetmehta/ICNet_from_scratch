@@ -109,7 +109,7 @@ class Cityscapes(Dataset):
                 target[obj.id][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 1
                 target[0][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 0
         target = torch.from_numpy(target)
-        return image, target, label
+        return image, target
 
 class RandomHorizontalflip:
     """"""
