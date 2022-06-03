@@ -12,32 +12,55 @@ random.seed(123)
 torch.manual_seed(123)
 print('seed created')
 
-ROOT = r"E:\Deep Learning Projects\datasets\Cityscapes"
-BATCH_SIZE = 4
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 0
+
+APPLY_AUG = True
+PRETRAINED = True
+BACKBONE = 'resnet152'
+ROOT = r"/Cityscapes"
+BATCH_SIZE = 16
+LEARNING_RATE = 5e-4
+NUM_WORKERS = 2
+PIN_MEMORY = True
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
-
+RESUME = False
+CKPT_PATH = "ckpt/pspnet_epoch_100.ckpt"
+os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+models = {
+            'resnet18':PSPNet(backbone_type="resnet18", backbone_out_features=512, pretrained=PRETRAINED),
+            'resnet34':PSPNet(backbone_type="resnet34", backbone_out_features=512, pretrained=PRETRAINED),
+            'resnet50':PSPNet(backbone_type="resnet50", backbone_out_features=2048, pretrained=PRETRAINED),
+            'resnet101':PSPNet(backbone_type="resnet101", backbone_out_features=2048, pretrained=PRETRAINED),
+            'resnet152':PSPNet(backbone_type="resnet152", backbone_out_features=2048, pretrained=PRETRAINED),
+}
 
-
-train_data = Cityscapes(root=ROOT, set_type='train')
+train_data = Cityscapes(root=ROOT, set_type='train', apply_aug=APPLY_AUG)
 val_data = Cityscapes(root=ROOT, set_type='val')
 
-train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
+train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=PIN_MEMORY)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
+start_epoch = 0
+model = models[BACKBONE].to(device)
+if RESUME:
+    state_dict = torch.load(CKPT_PATH)
+    model.load_state_dict(state_dict["model_state_dict"])
+    start_epoch = state_dict["epoch"] + 1
+    loss = state_dict['loss']
+    print(f"Starting training from epoch: {start_epoch-1} the loss was {loss}")
 
-model = PSPNet(backbone_type='resnet18').to(device)
-criterion = torch.nn.BCEWithLogitsLoss()
+
+criterion = torch.nn.NLLLoss2d()
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 print(f"Number of parameters = {sum(i.numel() for i in model.parameters())}")
 print('Starting training')
-for epoch in range(NUM_EPOCHS):
+for epoch in range(start_epoch, NUM_EPOCHS):
     loop = tqdm(train_loader)
     mean_loss = []
+    model.train()
     for image, target, label in loop:
+        target = torch.argmax(target, dim=1)
         image, target = image.to(device), target.to(device)
         pred = model(image)
         loss = criterion(pred, target)
@@ -54,14 +77,17 @@ for epoch in range(NUM_EPOCHS):
     print("starting validation ...")
     loop = tqdm(val_loader)
     mean_loss = []
+    model.eval()
     for image, target, label in loop:
-        image, target = image.to(device), target.to(device)
-        pred = model(image)
-        loss = criterion(pred, target)
-        mean_loss.append(loss.item())
+        with torch.no_grad():
+            target = torch.argmax(target, dim=1)
+            image, target = image.to(device), target.to(device)
+            pred = model(image)
+            loss = criterion(pred, target)
+            mean_loss.append(loss.item())
 
-        loop.set_description(f"Epoch [{epoch}/{NUM_EPOCHS}]")
-        loop.set_postfix(loss=loss.item())
+            loop.set_description(f"Epoch [{epoch}/{NUM_EPOCHS}]")
+            loop.set_postfix(loss=loss.item())
 
     print(f"Mean val loss was {sum(mean_loss)/len(mean_loss)}")
 
@@ -71,5 +97,5 @@ for epoch in range(NUM_EPOCHS):
                 'model_state_dict': model.state_dict(), 
                 'optimizer_state_dict': optimizer.state_dict()}
 
-        torch.save(state_dict, os.path.join(CKPT_DIR, f"pspnet_epoch_{epoch}.ckpt"))
+        torch.save(state_dict, os.path.join(CKPT_DIR, f"pspnet_{BACKBONE}_epoch_{epoch}.ckpt"))
 

@@ -1,16 +1,9 @@
-import torch
-from torch.utils.data import Dataset
-from torchvision.transforms import transforms
-import os
-from os.path import join as osp
-from PIL import Image
-import cv2
+import matplotlib.pyplot as plt
 import numpy as np
-from collections import namedtuple
-import random
-import torchvision.transforms.functional as TF
 
-from transforms import RandomHorizontalflip, RandomVerticalflip
+from collections import namedtuple
+
+import torch
 
 Label = namedtuple('Label', [
                    'name', 
@@ -58,81 +51,39 @@ labels = [
     Label(  'unlabeled'            , -1 ,      255 , 'void'            , 0       , False        , True         , (  0,  0,  0) ),
     
 ]
-resize = (256,512)
-img_resize = transforms.Resize(resize)
-img_transforms = transforms.RandomChoice([transforms.ColorJitter(brightness=.5, hue=.3), transforms.GaussianBlur(15, (2,10)), transforms.RandomPosterize(bits=2)])
-# joint_transforms = transforms.Compose([RandomHorizontalflip(), RandomVerticalflip()])
-to_pil = transforms.ToPILImage()
-to_tensor = transforms.ToTensor()
 
+def convert_image(pred):
+    output = np.zeros((3,pred.shape[0], pred.shape[1]))
+    for i in labels:
+        output[0][pred==i.id] = i.color[0]
+        output[1][pred==i.id] = i.color[1]
+        output[2][pred==i.id] = i.color[2]
+    output = np.transpose(output, (1,2,0))
+    return output.astype(np.uint8)
 
-class Cityscapes(Dataset):
+def plot_image(pred, target, image):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 3, 1)
+    image = image[0]
+    imgplot = plt.imshow(image.permute(1,2,0))
+    ax.set_title('Image')
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
 
-    def __init__(self, root, set_type='train', transforms=img_transforms, apply_aug=False) -> None:
-        super(Cityscapes, self).__init__()
-        self.image_list = []
-        self.label_list = []
-        image_root = osp(root,'leftImg8bit', set_type)
-        self.transforms = transforms
-        label_root = osp(root,'gtFine', set_type)
-        for city in os.listdir(image_root):
-            self.image_list += [osp(image_root,city,i) for i in os.listdir(osp(image_root, city))]
-            self.label_list += [osp(label_root,city,i[:-15]+"gtFine_color.png") for i in os.listdir(osp(image_root, city))]
+    ax = fig.add_subplot(1, 3, 2)
+    pred = torch.argmax(pred[0], dim=0)
+    pred_label = convert_image(pred)
+    imgplot = plt.imshow(pred_label)
+    ax.set_title('Prediction')
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
 
-        self.apply_aug = apply_aug
+    ax = fig.add_subplot(1, 3, 3)
+    target = torch.argmax(target[0], dim=0)
+    target_label = convert_image(target)
+    imgplot = plt.imshow(target_label)
+    ax.set_title('Target')
+    ax.axes.xaxis.set_visible(False)
+    ax.axes.yaxis.set_visible(False)
 
-
-    def __len__(self):
-        return len(self.image_list)
-
-    def __getitem__(self, index):
-        image = Image.open(self.image_list[index])
-        label = Image.open(self.label_list[index])
-        image, label = img_resize(image), img_resize(label)
-        if self.apply_aug:
-            image, label = RandomHorizontalflip()(image,label)
-            image, label = RandomVerticalflip()(image,label)
-            image = img_transforms(image)
-            image = to_tensor(image)
-
-            label = np.asarray(label)
-
-        else:
-            image = to_tensor(image)
-            label = np.asarray(label)
-
-        target = np.zeros((21,label.shape[0],label.shape[1]))
-        for obj in labels:
-            if obj.id == -1:
-                target[0][np.where(np.logical_and( np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]) , label[:,:,2]==obj.color[2]))] = 1
-            else:    
-                target[obj.id][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 1
-                target[0][np.logical_and(np.logical_and(label[:,:,0]==obj.color[0], label[:,:,1]==obj.color[1]), label[:,:,2]==obj.color[2])] = 0
-        target = torch.from_numpy(target)
-        return image, target, label
-
-class RandomHorizontalflip:
-    """"""
-
-    def __init__(self, prob=0.5):
-        self.prob = prob
-
-    def __call__(self, image, mask):
-        if random.random() > self.prob:
-            image = TF.hflip(image)
-            mask = TF.hflip(mask)
-        return image, mask
-
-class RandomVerticalflip:
-    """"""
-
-    def __init__(self, prob=0.5):
-        self.prob = prob
-
-    def __call__(self, image, mask):
-        if random.random() > self.prob:
-            image = TF.vflip(image)
-            mask = TF.vflip(mask)
-        return image, mask
-
-                
+    return fig

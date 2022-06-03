@@ -45,20 +45,18 @@ class PSPNet(nn.Module):
         super(PSPNet,self).__init__()
         self.backbone = model_factory(backbone_type, pretrained)
         self.psp = PSPModule(backbone_out_features, 1024, pool_scale)
-        self.drop_1 = nn.Dropout2d(p=0.3)
+        self.drop_1 = nn.Dropout2d(p=0.2)
 
-        self.up_1 = PSPUpsample(1024, 512)
-        self.up_2 = PSPUpsample(512, 256)
-        self.up_3 = PSPUpsample(256, 128)
-        self.up_4 = PSPUpsample(128, 64)
-        self.up_5 = PSPUpsample(64, 64)
+        self.up_1 = PSPUpsample(1024, 256)
+        self.up_2 = PSPUpsample(256, 64)
+        self.up_3 = PSPUpsample(64, 64)
 
-        self.drop_2 = nn.Dropout2d(p=0.15)
+        self.drop_2 = nn.Dropout2d(p=0.1)
         self.final = nn.Sequential(
             nn.Conv2d(64, n_classes, kernel_size=1),
             nn.LogSoftmax()
         )
-        self.network = nn.Sequential(self.backbone, self.psp, self.drop_1, self.up_1, self.up_2, self.up_3, self.up_4, self.up_5, self.drop_2, self.final)
+        self.network = nn.Sequential(self.backbone, self.psp, self.drop_1, self.up_1, self.up_2, self.up_3, self.drop_2, self.final)
 
     def forward(self, x):
         return self.network(x)
