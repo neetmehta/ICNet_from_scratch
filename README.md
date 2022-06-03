@@ -8,7 +8,7 @@ My implementation of ICNet
 
 This results are of PSPNet. ICNet is work in progress
 
-<p align = "center">
+<p align = "center" width="200">
     <img src = "./results/resnet50/visualize_9.png">
     <br>
 </p>
