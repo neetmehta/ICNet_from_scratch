@@ -18,13 +18,13 @@ PRETRAINED = True
 BACKBONE = 'resnet152'
 ROOT = r"/Cityscapes"
 BATCH_SIZE = 8
-LEARNING_RATE = 5e-4
+LEARNING_RATE = 1e-5
 NUM_WORKERS = 2
 PIN_MEMORY = True
 NUM_EPOCHS = 200
 CKPT_DIR = "ckpt"
-RESUME = False
-CKPT_PATH = "ckpt/pspnet_epoch_100.ckpt"
+RESUME = True
+CKPT_PATH = "ckpt/pspnet_resnet152_epoch_50.ckpt"
 os.makedirs(CKPT_DIR, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -42,13 +42,15 @@ val_data = Cityscapes(root=ROOT, set_type='val')
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=PIN_MEMORY)
 val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 start_epoch = 0
-model = models[BACKBONE].to(device)
+model = models[BACKBONE]
 val_loss = 10
 if RESUME:
     state_dict = torch.load(CKPT_PATH)
     model.load_state_dict(state_dict["model_state_dict"])
     start_epoch = state_dict["epoch"] + 1
     val_loss = state_dict['loss']
+    del state_dict
+    model = model.to(device)
     print(f"Starting training from epoch: {start_epoch-1} the loss was {val_loss}")
 
 
