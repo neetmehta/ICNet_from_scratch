@@ -14,7 +14,7 @@ This results are of PSPNet. ICNet is work in progress
 </p>
 
 ## Results on Kitti dataset
-model is trained on pspnet_resnet152 till epoch 20 on cityscapes. I evaluated on some of the kitti image.
+model is trained on Cityscapes till epoch 20. I evaluated on some of the kitti image.
 
 
 
