@@ -1,6 +1,6 @@
 # PSPnet_from_scratch
 
-My implementation of PSP et
+My implementation of PSPNet
 
 ## Dataset: Cityscapes
 
