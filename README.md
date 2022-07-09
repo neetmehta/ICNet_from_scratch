@@ -1,12 +1,12 @@
 # PSPnet_from_scratch
 
-My implementation of ICNet
+My implementation of PSP et
 
 ## Dataset: Cityscapes
 
 ## Results
 
-This results are of PSPNet. ICNet is work in progress
+This results of PSPNet.
 
 <p align = "center" width="200">
     <img src = "./results/resnet50/visualize_9.png">
