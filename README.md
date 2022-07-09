@@ -1,4 +1,4 @@
-# ICNet_from_scratch
+# PSPnet_from_scratch
 
 My implementation of ICNet
 
